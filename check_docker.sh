@@ -2,7 +2,7 @@
 
 # 标题
 echo "============================================="
-echo "         Docker 安装状态检测与安装工具"
+echo "         Docker 安装状态检测工具"
 echo "============================================="
 
 # 检查是否已安装Docker
@@ -60,9 +60,10 @@ if [ -t 0 ]; then
             ;;
     esac
 else
-    # 通过管道运行
+    # 通过管道运行 - 只显示选项，不尝试读取输入或执行
     echo "检测到脚本通过管道运行，无法接收交互式输入。"
     echo "您可以通过以下方式安装Docker："
+    echo ""
     echo "1. 使用Docker官方安装脚本："
     echo "   curl -fsSL https://get.docker.com | bash"
     echo "   或"
@@ -76,6 +77,8 @@ else
     echo "   curl -fsSL [脚本URL] -o docker-install.sh"
     echo "   chmod +x docker-install.sh"
     echo "   ./docker-install.sh"
+    
+    # 直接退出，不尝试安装或读取输入
     exit 0
 fi
 
