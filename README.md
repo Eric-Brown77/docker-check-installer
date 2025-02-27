@@ -15,4 +15,4 @@
 
 使用curl:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Eric-Brown77/docker-check-installer/main/check_docker.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Eric-Brown77/docker-check-installer/main/check_docker.sh -o docker-install.sh && chmod +x docker-install.sh && ./docker-install.sh
