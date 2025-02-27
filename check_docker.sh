@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 启用bash调试模式以显示详细执行信息
+set -x
+
 # 标题
 echo "============================================="
 echo "         Docker 安装状态检测与安装工具"
@@ -30,45 +33,39 @@ read -p "请输入选项 [1-4]: " choice
 case $choice in
     1)
         echo "执行安装: Docker官方安装脚本 (curl)"
-        echo "正在下载并执行Docker官方安装脚本..."
-        # 使用 -v 参数增加curl的详细输出
-        curl -v -fsSL https://get.docker.com -o get-docker.sh
-        echo "执行安装脚本..."
-        # 直接运行脚本而不通过管道，确保输出可见
-        bash get-docker.sh
+        # 下载脚本并设置环境变量强制显示详细输出
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        # 使用 bash -x 运行脚本，显示每个执行的命令
+        VERBOSE=1 DRY_RUN=0 bash -x get-docker.sh
         rm get-docker.sh
         ;;
     2)
         echo "执行安装: Docker官方安装脚本 (wget)"
-        echo "正在下载并执行Docker官方安装脚本..."
-        # 移除 -q 参数，允许wget显示进度
-        wget -O- get.docker.com > get-docker.sh
-        echo "执行安装脚本..."
-        bash get-docker.sh
+        wget -O get-docker.sh https://get.docker.com
+        VERBOSE=1 DRY_RUN=0 bash -x get-docker.sh
         rm get-docker.sh
         ;;
     3)
         echo "执行安装: 系统包管理器"
         if [ -f /etc/debian_version ]; then
             echo "检测到Debian/Ubuntu系统，使用apt安装..."
-            echo "正在更新软件包列表..."
+            set -x  # 启用命令跟踪
             sudo apt update -y
-            echo "安装Docker..."
             sudo apt install -y docker.io
-            echo "启用并启动Docker服务..."
             sudo systemctl enable docker
             sudo systemctl start docker
+            set +x  # 禁用命令跟踪
         elif [ -f /etc/redhat-release ]; then
             echo "检测到CentOS/RHEL系统，使用yum安装..."
-            echo "安装Docker..."
+            set -x  # 启用命令跟踪
             sudo yum install -y docker
-            echo "启用并启动Docker服务..."
             sudo systemctl enable docker
             sudo systemctl start docker
+            set +x  # 禁用命令跟踪
         else
             echo "无法确定系统类型，使用Docker官方脚本安装"
             curl -fsSL https://get.docker.com -o get-docker.sh
-            bash get-docker.sh
+            VERBOSE=1 DRY_RUN=0 bash -x get-docker.sh
             rm get-docker.sh
         fi
         ;;
@@ -81,6 +78,9 @@ case $choice in
         exit 1
         ;;
 esac
+
+# 关闭调试模式
+set +x
 
 # 安装后检查
 echo "检查Docker安装状态..."
